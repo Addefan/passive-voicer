@@ -28,10 +28,29 @@ def get_options():
             C.bold("Your choice? [0/1/2]: "))
 
 
+def get_sentence_handler():
+    while (tense := input(C.bold("Past, present or future tense? [pa/pr/fu]: "))[:2]) not in {"pa",
+                                                                                              "pr",
+                                                                                              "fu"}:
+        pass
+    tense_convert = {"pa": "past", "pr": "present", "fu": "future"}
+    tense = tense_convert[tense]
+    while (objnum := input(C.bold("Singular or plural? [s/p]: "))[:1]) not in {"s", "p"}:
+        pass
+    objnum_convert = {"s": "singular", "p": "plural"}
+    objnum = objnum_convert[objnum]
+    sentence = gen.get_sentence(tense, objnum)
+    print()
+    return (C.bold(f"{tense.capitalize()} tense, {objnum}, passive voice sentence example: ") +
+            C.border(C.italic(" " + sentence + " ")))
+
+
 def main():
     print(get_welcome_message())
-    while choice := input(get_options()).strip() != "0":
-        pass
+    while (choice := input(get_options()).strip()) != "0":
+        if choice == "1":
+            print(get_sentence_handler())
+        print()
     sys.exit()
 
 
