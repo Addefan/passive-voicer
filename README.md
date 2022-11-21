@@ -9,7 +9,8 @@
 1. Create a virtual environment - `python -m venv venv`
 2. Activate a virtual environment - `venv\Scripts\activate`
 3. Install requirements - `pip install -r requirements.txt`
-4. Application launch - `python app.py`
+4. Download trained models and pipelines for spaCy - `python -m spacy download en_core_web_sm`
+5. Application launch - `python app.py`
 
 ## Symbol designation in commits
 
