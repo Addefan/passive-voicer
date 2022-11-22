@@ -15,7 +15,7 @@ class SentenceGenerator:
     MONTH_REQUESTS_LIMIT = 1000
 
     @staticmethod
-    def _get_sentence_from_api(tense, objnum, subj_verb_obj_triple):
+    def _get_sentence_from_api(tense, objnum, aspect, subj_verb_obj_triple):
         url = "https://linguatools-sentence-generating.p.rapidapi.com/realise"
         headers = {
             "X-RapidAPI-Key": os.environ.get("RAPID_API_KEY", "SIGN-UP-FOR-KEY"),
@@ -30,6 +30,8 @@ class SentenceGenerator:
             "objnum": objnum,
             "passive": "passive",
         }
+        if aspect != "present":
+            querystring[aspect] = aspect
         response = requests.request("GET", url, headers=headers, params=querystring)
         if response.status_code == HTTPStatus.OK:
             response = response.json()
@@ -38,10 +40,10 @@ class SentenceGenerator:
                 return sentence
 
     @staticmethod
-    def _get_sentence_from_file(tense, objnum):
+    def _get_sentence_from_file(tense, objnum, aspect):
         with open("sentences.json", "r", encoding="utf-8") as sentences_file:
             sentences_list = json.load(sentences_file)
-            sentence = random.choice(sentences_list[f"{tense}_{objnum}"])
+            sentence = random.choice(sentences_list[f"{tense}_{aspect}_{objnum}"])
             return sentence
 
     @staticmethod
@@ -63,7 +65,7 @@ class SentenceGenerator:
                 requests_file.seek(0)
                 pickle.dump(requests_deque, requests_file)
 
-    def get_sentence(self, tense, objnum, subj_verb_obj_triple=None):
+    def get_sentence(self, tense, objnum, aspect="present", subj_verb_obj_triple=None):
         self._check_expiration_requests()
         with open("requests.pickle", "rb+") as requests_file:
             requests_list = pickle.load(requests_file)
@@ -73,13 +75,13 @@ class SentenceGenerator:
                 pickle.dump(requests_list, requests_file)
                 if not subj_verb_obj_triple:
                     subj_verb_obj_triple = self._get_subj_verb_obj_triple()
-                sentence = self._get_sentence_from_api(tense, objnum, subj_verb_obj_triple)
+                sentence = self._get_sentence_from_api(tense, objnum, aspect, subj_verb_obj_triple)
                 if sentence:
                     with open("sentences.json", "r+", encoding="utf-8") as sentences_file:
                         sentences_list = json.load(sentences_file)
-                        sentences_list[f"{tense}_{objnum}"].append(sentence)
+                        sentences_list[f"{tense}_{aspect}_{objnum}"].append(sentence)
                         sentences_file.seek(0)
                         json.dump(sentences_list, sentences_file)
                     return sentence
-            sentence = self._get_sentence_from_file(tense, objnum)
+            sentence = self._get_sentence_from_file(tense, objnum, aspect)
             return sentence

@@ -39,20 +39,28 @@ def get_options():
 
 
 def get_sentence_handler():
-    while (tense := input(C.bold("Past, present or future tense? [pa/pr/fu]: "))[:2]) not in {"pa",
-                                                                                              "pr",
-                                                                                              "fu"}:
+    while (tense := input(C.bold("Past, present or future "
+                                 "tense? [pa/pr/fu]: "))[:2]) not in {"pa", "pr", "fu"}:
         pass
     tense_convert = {"pa": "past", "pr": "present", "fu": "future"}
     tense = tense_convert[tense]
+    if tense == "future":
+        while (aspect := input(C.bold("Simple or perfect aspect? [s/p]: "))[:1]) not in {"s", "p"}:
+            pass
+    else:
+        while (aspect := input(C.bold("Simple, continuous (progressive) "
+                                      "or perfect aspect? [s/c/p]: "))[:1]) not in {"s", "c", "p"}:
+            pass
+    aspect_convert = {"s": "simple", "c": "progressive", "p": "perfect"}
+    aspect = aspect_convert[aspect]
     while (objnum := input(C.bold("Singular or plural? [s/p]: "))[:1]) not in {"s", "p"}:
         pass
     objnum_convert = {"s": "singular", "p": "plural"}
     objnum = objnum_convert[objnum]
-    sentence = gen.get_sentence(tense, objnum)
+    sentence = gen.get_sentence(tense, objnum, aspect)
     print()
-    return (C.bold(f"{tense.capitalize()} tense, {objnum}, passive voice sentence example: ") +
-            C.border(C.italic(" " + sentence + " ")))
+    return (C.bold(f"{tense.capitalize()} tense, {aspect} aspect, {objnum}, "
+                   f"passive voice sentence example: ") + C.border(C.italic(" " + sentence + " ")))
 
 
 def identify_passive_handler():
